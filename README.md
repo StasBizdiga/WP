@@ -6,4 +6,4 @@ Personal information:
 
 - Student: Bizdiga Stanislav
 
-- Mail: stanislav.bizdiga@faf.utm.md
+- Mail: azurium.official@gmail.com
