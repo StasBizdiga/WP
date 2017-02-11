@@ -1,3 +1,9 @@
-# WP
+#Laboratory works repository
 
-Here I will have my laboratory works for Winddows Programming Course
+Personal information:
+
+- Group: FAF-151
+
+- Student: Bizdiga Stanislav
+
+- Mail: stanislav.bizdiga@faf.utm.md
