@@ -120,8 +120,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(HMENU)IDC_MAIN_EDIT,
 				GetModuleHandle(NULL),
 				NULL);
-			HGDIOBJ hfDefault=GetStockObject(DEFAULT_GUI_FONT);
-			SendMessage(hEdit,
+                HGDIOBJ hfDefault=GetStockObject(DEFAULT_GUI_FONT);
+                SendMessage(hEdit,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
@@ -142,7 +142,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(HMENU)IDC_MAIN_BUTTON,
 				GetModuleHandle(NULL),
 				NULL);
-            SendMessage(hWndButton1,
+                SendMessage(hWndButton1,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
@@ -161,13 +161,19 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(HMENU)IDC_LAUGH_BUTTON,
 				GetModuleHandle(NULL),
 				NULL);
-            SendMessage(hWndButton2,
+                SendMessage(hWndButton2,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
 		}
 		break;
 
+    case WM_GETMINMAXINFO: {
+                ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 550;
+                ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 375;
+
+            break;
+            }
 
     case WM_COMMAND:
 			switch(LOWORD(wParam))
@@ -203,33 +209,37 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 			break;
 
      case WM_PAINT:
-          hdc = BeginPaint (hwnd, &ps) ;
+            hdc = BeginPaint (hwnd, &ps) ;
 
-          GetClientRect (hwnd, &rect) ;
+            GetClientRect (hwnd, &rect) ;
 
           /*center text*/
-          DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
+            DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
                     DT_SINGLELINE | DT_BOTTOM | DT_RIGHT) ;
 
 
             SetBkMode(hdc, TRANSPARENT);                                                                       // Set the background to be transparent
             SetTextColor(hdc, RGB(0,200,0));                                                                   // Setting the text color
-			DrawText(hdc, "\nLet's Have Some Fun", -1, &rect, DT_CENTER | DT_TOP);                             // Drawing the text on top aligning it to center
+
+            DrawText(hdc, "\nLet's Have Some Fun", -1, &rect, DT_CENTER | DT_TOP);                             // Drawing the text on top aligning it to center
+
             textFont  = CreateFont(0, 0, 0, 0, FW_SEMIBOLD, TRUE, 0, 0, 0, 0, 0, 0, 0, "Calibri");             // Creating the text font to semibold, italic, choosing Calibri font
             hFontOld  = (HFONT)SelectObject(hdc,textFont);                                                     // Setting the text font
             SetTextColor(hdc,RGB(200,10,10));                                                                  // Setting the text color
             SetBkMode(hdc, TRANSPARENT);                                                                       // Set the background to be transparent
+
             DrawText(hdc, "\n\nTesting your joking skills", -1, &rect, DT_CENTER | DT_TOP);                    // Drawing the text on top aligning it to center
+
             SetTextColor(hdc, RGB(0, 100, 0));                                                                 // Resetting the color to black
 
 
 
-          EndPaint (hwnd, &ps) ;
-          return 0 ;
+            EndPaint (hwnd, &ps) ;
+            return 0 ;
 
      case WM_DESTROY:
-          PostQuitMessage (0) ;
-          return 0 ;
+            PostQuitMessage (0) ;
+            return 0 ;
      }
      return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
