@@ -72,7 +72,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /*  The following function is called by DispatchMessage()  */
 LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-//     int         t = 0;
      HDC         hdc ;
      PAINTSTRUCT ps ;
      RECT        rect ;
