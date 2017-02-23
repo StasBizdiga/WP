@@ -84,6 +84,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
      switch (message)
      {
+
      case WM_CREATE:
          {
             /*Get height and width of screen*/
@@ -339,7 +340,6 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
 			}
 			break;
-
 
      case WM_PAINT:
             hdc = BeginPaint (hwnd, &ps) ;
