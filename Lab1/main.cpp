@@ -2,6 +2,8 @@
 #define IDC_MAIN_BUTTON 101
 #define IDC_MAIN_EDIT	102	// Edit box identifier
 #define IDC_OUTPUT_TEXT 103
+#define IDC_LAUGH_BUTTON 104
+
 HWND hEdit;
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowsProcedure (HWND, UINT, WPARAM, LPARAM) ;
@@ -70,15 +72,17 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
      PAINTSTRUCT ps ;
      RECT        rect ;
      HINSTANCE    hInst;
+     HFONT textFont,hFontOld;
 
      switch (message)
      {
      case WM_CREATE:
          {
+            /* Create title (output) text box */
             HWND hTitle = CreateWindowEx(
                 (DWORD)NULL,
                 TEXT("EDIT"),                                                   // The class name required is edit
-                TEXT("M a n l y"),                                                       // Default text.
+                TEXT("Type a joke below:"),                                                       // Default text.
                 WS_VISIBLE | WS_CHILD | ES_READONLY,
                 50, 75,                                                         // the left and top co-ordinates
                 200, 20,                                                       // width and height
@@ -87,7 +91,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                 hInst,                                                          // the instance of your application
                 NULL);
 
-            /* Create an edit box */
+            /* Create a text edit box */
             hEdit=CreateWindowEx(WS_EX_CLIENTEDGE,
 				"EDIT",
 				"",
@@ -109,10 +113,10 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 			SendMessage(hEdit,
 				WM_SETTEXT,
 				NULL,
-				(LPARAM)"Write your joke here...");
+				(LPARAM)"So... ");
 
-         /* create push button */
-         HWND hWndButton=CreateWindowEx(NULL,
+         /* create push button1 */
+         HWND hWndButton1=CreateWindowEx(NULL,
 				"BUTTON",
 				"Say it!",
 				WS_TABSTOP|WS_VISIBLE|
@@ -125,8 +129,26 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(HMENU)IDC_MAIN_BUTTON,
 				GetModuleHandle(NULL),
 				NULL);
+            SendMessage(hWndButton1,
+				WM_SETFONT,
+				(WPARAM)hfDefault,
+				MAKELPARAM(FALSE,0));
 
-            SendMessage(hWndButton,
+            /* create push button2 */
+         HWND hWndButton2=CreateWindowEx(NULL,
+				"BUTTON",
+				"Laugh!",
+				WS_TABSTOP|WS_VISIBLE|
+				WS_CHILD|BS_DEFPUSHBUTTON,
+				50,     //button x pos
+				250,    //button y pos
+				200,    //button width
+				24,     // button height
+				hwnd,
+				(HMENU)IDC_LAUGH_BUTTON,
+				GetModuleHandle(NULL),
+				NULL);
+            SendMessage(hWndButton2,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
@@ -146,8 +168,18 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						reinterpret_cast<LPARAM>(buffer));
 					MessageBox(NULL,
 						buffer,
-						"Computer says:",
+						"You joke:",
 						MB_ICONINFORMATION);
+				}
+				break;
+
+				case IDC_LAUGH_BUTTON:
+				{
+					MessageBox(NULL,
+						TEXT ("Hahaha"),
+						"You laugh:",
+						MB_ICONINFORMATION);
+
 				}
 				break;
 			}
@@ -160,7 +192,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
           /*center text*/
           DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
-                    DT_SINGLELINE | DT_CENTER | DT_VCENTER) ;
+                    DT_SINGLELINE | DT_BOTTOM | DT_RIGHT) ;
 
           EndPaint (hwnd, &ps) ;
           return 0 ;
