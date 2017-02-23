@@ -1,10 +1,12 @@
 #include <windows.h>
-#define IDC_MAIN_BUTTON 101
-#define IDC_MAIN_EDIT	102	// Edit box identifier
-#define IDC_OUTPUT_TEXT 103
-#define IDC_LAUGH_BUTTON 104
 
-HWND hEdit;
+#define IDC_MAIN_EDIT	 102	// Edit box identifier
+#define IDC_OUTPUT_TEXT  103
+#define IDC_OUTPUT_MOOD  104
+#define IDC_LAUGH_BUTTON 105
+#define IDC_MAIN_BUTTON  106
+
+HWND hEdit,hMood;
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowsProcedure (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -40,12 +42,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 /*   Once class is registered, create the window*/
      hwnd = CreateWindow (szAppName,             // window class name
-                          TEXT ("Talker"),        // window caption
+                          TEXT ("Talker"),       // window caption
                           WS_OVERLAPPEDWINDOW,   // window style
                           CW_USEDEFAULT,         // initial x position
                           CW_USEDEFAULT,         // initial y position
-                          CW_USEDEFAULT,         // initial x size
-                          CW_USEDEFAULT,         // initial y size
+                          800,                   // initial x size
+                          400,                   // initial y size
                           NULL,                  // parent window handle
                           NULL,                  // window menu handle
                           hInstance,             // program instance handle
@@ -91,10 +93,23 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                 hInst,                                                          // the instance of your application
                 NULL);
 
-            /* Create a text edit box */
+            /* Create reaction (output) text box */
+            hMood = CreateWindowEx(
+                (DWORD)NULL,
+                TEXT("EDIT"),                                                   // The class name required is edit
+                "",                                                       // Default text.
+                WS_VISIBLE | WS_CHILD | ES_READONLY | WS_BORDER,
+                300, 100,                                                         // the left and top co-ordinates
+                200, 100,                                                       // width and height
+                hwnd,                                                           // parent window handle
+                (HMENU)IDC_OUTPUT_MOOD,                                         // the ID of your editbox
+                hInst,                                                          // the instance of your application
+                NULL);
+
+				/* Create a text edit box */
             hEdit=CreateWindowEx(WS_EX_CLIENTEDGE,
 				"EDIT",
-				"",
+				"So...",
 				WS_CHILD|WS_VISIBLE|
 				ES_MULTILINE|ES_AUTOVSCROLL|ES_AUTOHSCROLL,
 				50,     // x pos
@@ -110,10 +125,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
-			SendMessage(hEdit,
-				WM_SETTEXT,
-				NULL,
-				(LPARAM)"So... ");
+
+
 
          /* create push button1 */
          HWND hWndButton1=CreateWindowEx(NULL,
@@ -170,6 +183,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						buffer,
 						"You joke:",
 						MB_ICONINFORMATION);
+                    SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)" (O_o)  Wut..");
+
 				}
 				break;
 
@@ -179,6 +194,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						TEXT ("Hahaha"),
 						"You laugh:",
 						MB_ICONINFORMATION);
+                    SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :D !!!  Funny!");
+
 
 				}
 				break;
@@ -193,6 +210,19 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
           /*center text*/
           DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
                     DT_SINGLELINE | DT_BOTTOM | DT_RIGHT) ;
+
+
+            SetBkMode(hdc, TRANSPARENT);                                                                       // Set the background to be transparent
+            SetTextColor(hdc, RGB(0,200,0));                                                                   // Setting the text color
+			DrawText(hdc, "\nLet's Have Some Fun", -1, &rect, DT_CENTER | DT_TOP);                             // Drawing the text on top aligning it to center
+            textFont  = CreateFont(0, 0, 0, 0, FW_SEMIBOLD, TRUE, 0, 0, 0, 0, 0, 0, 0, "Calibri");             // Creating the text font to semibold, italic, choosing Calibri font
+            hFontOld  = (HFONT)SelectObject(hdc,textFont);                                                     // Setting the text font
+            SetTextColor(hdc,RGB(200,10,10));                                                                  // Setting the text color
+            SetBkMode(hdc, TRANSPARENT);                                                                       // Set the background to be transparent
+            DrawText(hdc, "\n\nTesting your joking skills", -1, &rect, DT_CENTER | DT_TOP);                    // Drawing the text on top aligning it to center
+            SetTextColor(hdc, RGB(0, 100, 0));                                                                 // Resetting the color to black
+
+
 
           EndPaint (hwnd, &ps) ;
           return 0 ;
