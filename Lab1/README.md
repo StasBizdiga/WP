@@ -8,6 +8,10 @@
 
 **Year:** 2017
 
+_Red Pill_
+
 ## Laboratory Work 1
 
-_Red Pill_
+Chosen PSG: Geotechnical Software Services C++ PSG
+
+http://geosoft.no/development/cppstyle.html
