@@ -1,5 +1,8 @@
 #include <windows.h>
-
+#define IDC_MAIN_BUTTON 101
+#define IDC_MAIN_EDIT	102	// Edit box identifier
+#define IDC_OUTPUT_TEXT 103
+HWND hEdit;
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowsProcedure (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -7,7 +10,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PSTR szCmdLine, int iCmdShow)
 {
 /*   Set the name for the application  */
-     static TCHAR szAppName[] = TEXT ("Lab_1") ;
+     static TCHAR szAppName[] = TEXT ("Talker") ;
 
      HWND         hwnd ;      /* Handle for window */
      MSG          message ;   /* Store messages here */
@@ -35,7 +38,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 /*   Once class is registered, create the window*/
      hwnd = CreateWindow (szAppName,             // window class name
-                          TEXT ("Lab#1"),        // window caption
+                          TEXT ("Talker"),        // window caption
                           WS_OVERLAPPEDWINDOW,   // window style
                           CW_USEDEFAULT,         // initial x position
                           CW_USEDEFAULT,         // initial y position
@@ -66,17 +69,96 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
      HDC         hdc ;
      PAINTSTRUCT ps ;
      RECT        rect ;
+     HINSTANCE    hInst;
 
      switch (message)
      {
      case WM_CREATE:
-         return 0 ;
+         {
+            HWND hTitle = CreateWindowEx(
+                (DWORD)NULL,
+                TEXT("EDIT"),                                                   // The class name required is edit
+                TEXT("M a n l y"),                                                       // Default text.
+                WS_VISIBLE | WS_CHILD | ES_READONLY,
+                50, 75,                                                         // the left and top co-ordinates
+                200, 20,                                                       // width and height
+                hwnd,                                                           // parent window handle
+                (HMENU)IDC_OUTPUT_TEXT,                                         // the ID of your editbox
+                hInst,                                                          // the instance of your application
+                NULL);
+
+            /* Create an edit box */
+            hEdit=CreateWindowEx(WS_EX_CLIENTEDGE,
+				"EDIT",
+				"",
+				WS_CHILD|WS_VISIBLE|
+				ES_MULTILINE|ES_AUTOVSCROLL|ES_AUTOHSCROLL,
+				50,     // x pos
+				100,    // y pos
+				200,    // x size
+				100,    // y size
+				hwnd,
+				(HMENU)IDC_MAIN_EDIT,
+				GetModuleHandle(NULL),
+				NULL);
+			HGDIOBJ hfDefault=GetStockObject(DEFAULT_GUI_FONT);
+			SendMessage(hEdit,
+				WM_SETFONT,
+				(WPARAM)hfDefault,
+				MAKELPARAM(FALSE,0));
+			SendMessage(hEdit,
+				WM_SETTEXT,
+				NULL,
+				(LPARAM)"Write your joke here...");
+
+         /* create push button */
+         HWND hWndButton=CreateWindowEx(NULL,
+				"BUTTON",
+				"Say it!",
+				WS_TABSTOP|WS_VISIBLE|
+				WS_CHILD|BS_DEFPUSHBUTTON,
+				50,     //button x pos
+				220,    //button y pos
+				200,    //button width
+				24,     // button height
+				hwnd,
+				(HMENU)IDC_MAIN_BUTTON,
+				GetModuleHandle(NULL),
+				NULL);
+
+            SendMessage(hWndButton,
+				WM_SETFONT,
+				(WPARAM)hfDefault,
+				MAKELPARAM(FALSE,0));
+		}
+		break;
+
+
+    case WM_COMMAND:
+			switch(LOWORD(wParam))
+            {
+				case IDC_MAIN_BUTTON:
+				{
+					char buffer[256];
+					SendMessage(hEdit,
+						WM_GETTEXT,
+						sizeof(buffer)/sizeof(buffer[0]),
+						reinterpret_cast<LPARAM>(buffer));
+					MessageBox(NULL,
+						buffer,
+						"Computer says:",
+						MB_ICONINFORMATION);
+				}
+				break;
+			}
+			break;
 
      case WM_PAINT:
           hdc = BeginPaint (hwnd, &ps) ;
 
           GetClientRect (hwnd, &rect) ;
 
+          /*center text*/
           DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
                     DT_SINGLELINE | DT_CENTER | DT_VCENTER) ;
 
@@ -89,3 +171,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
      }
      return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
+
+
+
+
