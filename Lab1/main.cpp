@@ -10,11 +10,11 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
      static TCHAR szAppName[] = TEXT ("Lab_1") ;
 
      HWND         hwnd ;      /* Handle for window */
-     message      message ;   /* Store messages here */
+     MSG          message ;   /* Store messages here */
      WNDCLASS     winclass ;  /* WindowClass data structure*/
 
      winclass.style         = CS_HREDRAW | CS_VREDRAW ;
-     winclass.lpfnWindowsProcedure   = WindowsProcedure ;
+     winclass.lpfnWndProc   = WindowsProcedure ;
      winclass.cbClsExtra    = 0 ;
      winclass.cbWndExtra    = 0 ;
      winclass.hInstance     = hInstance ;
