@@ -1,10 +1,11 @@
 #include <windows.h>
 
-#define IDC_MAIN_EDIT	 102	// Edit box identifier
-#define IDC_OUTPUT_TEXT  103
-#define IDC_OUTPUT_MOOD  104
-#define IDC_LAUGH_BUTTON 105
-#define IDC_MAIN_BUTTON  106
+#define IDC_MAIN_EDIT	  102	// Edit box identifier
+#define IDC_OUTPUT_TEXT   103
+#define IDC_OUTPUT_MOOD   104
+#define IDC_LAUGH_BUTTON  105
+#define IDC_MAIN_BUTTON   106
+#define IDC_CENTER_BUTTON 107
 
 HWND hEdit,hMood;
 /*  Declare Windows procedure  */
@@ -70,19 +71,35 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /*  The following function is called by DispatchMessage()  */
 LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+     int         t = 0;
      HDC         hdc ;
      PAINTSTRUCT ps ;
      RECT        rect ;
-     HINSTANCE    hInst;
-     HFONT textFont,hFontOld;
+     HINSTANCE   hInst;
+     HFONT       textFont,hFontOld;
+	 int         screenX;                                                                                                                 //characters ave width of string
+     int         screenY;
 
      switch (message)
      {
      case WM_CREATE:
          {
-            /* Create title (output) text box */
-            HWND hTitle = CreateWindowEx(
-                (DWORD)NULL,
+            /*Get height and width of screen*/
+            screenX = GetSystemMetrics(SM_CXSCREEN);
+            screenY = GetSystemMetrics(SM_CYSCREEN);
+
+            /*Center window based on height and width of screen*/
+            GetClientRect(hwnd, &rect);
+            SetWindowPos(
+                    hwnd, 0,
+                    (screenX - rect.right)/2,
+                    (screenY - rect.bottom)/2,
+                    0, 0,
+					SWP_NOZORDER|SWP_NOSIZE);
+
+                /* Create title text box */
+                HWND hTitle = CreateWindowEx(
+                (DWORD)WS_EX_DLGMODALFRAME,
                 TEXT("EDIT"),                                                   // The class name required is edit
                 TEXT("Type a joke below:"),                                                       // Default text.
                 WS_VISIBLE | WS_CHILD | ES_READONLY,
@@ -93,8 +110,21 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                 hInst,                                                          // the instance of your application
                 NULL);
 
-            /* Create reaction (output) text box */
-            hMood = CreateWindowEx(
+                /* Create another title text box */
+                HWND hTitleMood = CreateWindowEx(
+                (DWORD)WS_EX_DLGMODALFRAME,
+                TEXT("EDIT"),                                                   // The class name required is edit
+                TEXT("C o m p u t e r   r e a c t i o n"),                                                       // Default text.
+                WS_VISIBLE | WS_CHILD | ES_READONLY,
+                300, 75,                                                         // the left and top co-ordinates
+                200, 20,                                                       // width and height
+                hwnd,                                                           // parent window handle
+                (HMENU)IDC_OUTPUT_TEXT,                                         // the ID of your editbox
+                hInst,                                                          // the instance of your application
+                NULL);
+
+                /* Create reaction text box */
+                hMood = CreateWindowEx(
                 (DWORD)NULL,
                 TEXT("EDIT"),                                                   // The class name required is edit
                 "",                                                       // Default text.
@@ -107,7 +137,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                 NULL);
 
 				/* Create a text edit box */
-            hEdit=CreateWindowEx(WS_EX_CLIENTEDGE,
+                hEdit=CreateWindowEx(WS_EX_CLIENTEDGE,
 				"EDIT",
 				"So...",
 				WS_CHILD|WS_VISIBLE|
@@ -128,8 +158,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
 
 
-         /* create push button1 */
-         HWND hWndButton1=CreateWindowEx(NULL,
+                /* create push button 1 */
+                HWND sayButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"Say it!",
 				WS_TABSTOP|WS_VISIBLE|
@@ -137,18 +167,18 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				50,     //button x pos
 				220,    //button y pos
 				200,    //button width
-				24,     // button height
+				25,     // button height
 				hwnd,
 				(HMENU)IDC_MAIN_BUTTON,
 				GetModuleHandle(NULL),
 				NULL);
-                SendMessage(hWndButton1,
+                SendMessage(sayButton,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
 
-            /* create push button2 */
-         HWND hWndButton2=CreateWindowEx(NULL,
+                /* create push button 2 */
+                HWND laughButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"Laugh!",
 				WS_TABSTOP|WS_VISIBLE|
@@ -156,15 +186,36 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				50,     //button x pos
 				250,    //button y pos
 				200,    //button width
-				24,     // button height
+				25,     // button height
 				hwnd,
 				(HMENU)IDC_LAUGH_BUTTON,
 				GetModuleHandle(NULL),
 				NULL);
-                SendMessage(hWndButton2,
+                SendMessage(laughButton,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
+
+				/* create centering button 3 */
+                HWND centeringButton = CreateWindowEx(NULL,
+				"BUTTON",
+				"CENTER",
+				WS_TABSTOP|WS_VISIBLE|
+				WS_CHILD|BS_DEFPUSHBUTTON,
+				300,     //button x pos
+				220,     //button y pos
+				200,     //button width
+				25,     // button height
+				hwnd,
+				(HMENU)IDC_CENTER_BUTTON,
+				GetModuleHandle(NULL),
+				NULL);
+                SendMessage(centeringButton,
+				WM_SETFONT,
+				(WPARAM)hfDefault,
+				MAKELPARAM(FALSE,0));
+
+
 		}
 		break;
 
@@ -178,6 +229,30 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
     case WM_COMMAND:
 			switch(LOWORD(wParam))
             {
+                case IDC_CENTER_BUTTON:
+                    {
+                        screenX = GetSystemMetrics(SM_CXSCREEN);
+                        screenY = GetSystemMetrics(SM_CYSCREEN);
+
+                        GetClientRect(hwnd, &rect);
+                        SetWindowPos(
+                        hwnd, 0,
+                        (screenX/2 - rect.right/2),
+                        (screenY/2 - rect.bottom/2),
+                        0, 0,
+                        SWP_NOZORDER|SWP_NOSIZE);
+
+                        /* cpu reaction */
+                        SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)" (^_^)  Perfect.");
+
+
+				        MessageBox(NULL,
+						TEXT ("Centered"),
+						"Did you notice?",
+						MB_ICONQUESTION);
+				    }
+                break;
+
 				case IDC_MAIN_BUTTON:
 				{
 					char buffer[256];
@@ -189,6 +264,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						buffer,
 						"You joke:",
 						MB_ICONINFORMATION);
+
+                    /* cpu reaction */
                     SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)" (O_o)  Wut..");
 
 				}
@@ -199,7 +276,9 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 					MessageBox(NULL,
 						TEXT ("Hahaha"),
 						"You laugh:",
-						MB_ICONINFORMATION);
+						MB_ICONWARNING);
+
+                    /* cpu reaction */
                     SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :D !!!  Funny!");
 
 
@@ -233,11 +312,11 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
             SetTextColor(hdc, RGB(0, 100, 0));                                                                 // Resetting the color to black
 
 
-
             EndPaint (hwnd, &ps) ;
             return 0 ;
 
-     case WM_DESTROY:
+
+    case WM_DESTROY:
             PostQuitMessage (0) ;
             return 0 ;
      }
