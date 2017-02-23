@@ -6,6 +6,7 @@
 #define IDC_LAUGH_BUTTON  105
 #define IDC_MAIN_BUTTON   106
 #define IDC_CENTER_BUTTON 107
+#define IDC_MICRO_BUTTON  108
 
 HWND hEdit,hMood;
 /*  Declare Windows procedure  */
@@ -71,14 +72,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /*  The following function is called by DispatchMessage()  */
 LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-     int         t = 0;
+//     int         t = 0;
      HDC         hdc ;
      PAINTSTRUCT ps ;
      RECT        rect ;
      HINSTANCE   hInst;
+     HGDIOBJ hfDefault=GetStockObject(DEFAULT_GUI_FONT);
      HFONT       textFont,hFontOld;
 	 int         screenX;                                                                                                                 //characters ave width of string
      int         screenY;
+
 
      switch (message)
      {
@@ -96,6 +99,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                     (screenY - rect.bottom)/2,
                     0, 0,
 					SWP_NOZORDER|SWP_NOSIZE);
+
+
 
                 /* Create title text box */
                 HWND hTitle = CreateWindowEx(
@@ -150,7 +155,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(HMENU)IDC_MAIN_EDIT,
 				GetModuleHandle(NULL),
 				NULL);
-                HGDIOBJ hfDefault=GetStockObject(DEFAULT_GUI_FONT);
+                hfDefault;
                 SendMessage(hEdit,
 				WM_SETFONT,
 				(WPARAM)hfDefault,
@@ -215,16 +220,38 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
 
+				/* create coloring button 4 */
+                HWND microButton = CreateWindowEx(NULL,
+				"BUTTON",
+				"MICRO",
+				WS_TABSTOP|WS_VISIBLE|
+				WS_CHILD|BS_DEFPUSHBUTTON,
+				300,     //button x pos
+				250,     //button y pos
+				200,     //button width
+				25,     // button height
+				hwnd,
+				(HMENU)IDC_MICRO_BUTTON,
+				GetModuleHandle(NULL),
+				NULL);
+                SendMessage(microButton,
+				WM_SETFONT,
+				(WPARAM)hfDefault,
+				MAKELPARAM(FALSE,0));
 
 		}
 		break;
 
-    case WM_GETMINMAXINFO: {
+    case WM_GETMINMAXINFO:
+
+                /* setting min/max window size */
                 ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 550;
                 ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 375;
+                ((MINMAXINFO*)lParam)->ptMaxTrackSize.x = 825;
+                ((MINMAXINFO*)lParam)->ptMaxTrackSize.y = 550;
 
             break;
-            }
+
 
     case WM_COMMAND:
 			switch(LOWORD(wParam))
@@ -265,9 +292,15 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						"You joke:",
 						MB_ICONINFORMATION);
 
+                    int i = rand()%5; //randomize
+                    switch(i){
                     /* cpu reaction */
-                    SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)" (O_o)  Wut..");
-
+                    case 0: {SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  (O_o)  Wut..");}break;
+                    case 1: {SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :] Got one more?");}break;
+                    case 2: {SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :0 Whoa really?..");}break;
+                    case 3: {SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :3 Fancy !");}break;
+                    case 4: {SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)"  :( Aargh! No, more..");}break;
+                    }
 				}
 				break;
 
@@ -284,15 +317,37 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
 				}
 				break;
+
+				case IDC_MICRO_BUTTON:
+				{
+					MessageBox(NULL,
+						TEXT ("You'll love it"),
+						"It's mini",
+						MB_ICONWARNING);
+
+                        GetClientRect(hwnd, &rect);
+
+                    SetWindowPos(
+                        hwnd, 0,
+                        0,
+                        0,
+                        550, 375,
+                        SWP_NOMOVE | SWP_NOZORDER );
+
+                    /* cpu reaction */
+                    SendMessage(hMood, WM_SETTEXT, 0, (LPARAM)" :O !!  wow !!");}break;
+
+
 			}
 			break;
+
 
      case WM_PAINT:
             hdc = BeginPaint (hwnd, &ps) ;
 
             GetClientRect (hwnd, &rect) ;
 
-          /*center text*/
+            /*center text*/
             DrawText (hdc, TEXT ("Done with Pride and Prejudice by StasBizdiga!"), -1, &rect,
                     DT_SINGLELINE | DT_BOTTOM | DT_RIGHT) ;
 
