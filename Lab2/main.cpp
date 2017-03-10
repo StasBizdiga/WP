@@ -1,8 +1,8 @@
 #include <windows.h>
 
 
-#define IDC_CENTER_BUTTON 107
-#define IDC_MICRO_BUTTON  108
+#define IDC_CENTER_BUTTON 101
+#define IDC_MICRO_BUTTON  102
 
 HWND hEdit,hMood;
 /*  Declare Windows procedure  */
@@ -41,7 +41,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /*   Once class is registered, create the window*/
      hwnd = CreateWindow (szAppName,             // window class name
                           TEXT ("Lab-2"),       // window caption
-                          WS_OVERLAPPEDWINDOW,   // window style
+                          WS_OVERLAPPEDWINDOW | WS_HSCROLL | WS_VSCROLL,
                           CW_USEDEFAULT,         // initial x position
                           CW_USEDEFAULT,         // initial y position
                           800,                   // initial x size
@@ -63,6 +63,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
      }
      return message.wParam ;
 }
+
 
 
 /*  The following function is called by DispatchMessage()  */
@@ -97,16 +98,14 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 					SWP_NOZORDER|SWP_NOSIZE);
 
 
-
-
 				/* create centering button 3 */
                 HWND centeringButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"CENTER",
 				WS_TABSTOP|WS_VISIBLE|
 				WS_CHILD|BS_DEFPUSHBUTTON,
-				300,     //button x pos
-				220,     //button y pos
+				(screenX - rect.right)/2,     //button x pos
+				(screenY - rect.bottom)/2 - 50,     //button y pos
 				200,     //button width
 				25,     // button height
 				hwnd,
@@ -118,14 +117,14 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
 
-				/* create coloring button 4 */
+				/* create micro button 4 */
                 HWND microButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"MICRO",
 				WS_TABSTOP|WS_VISIBLE|
 				WS_CHILD|BS_DEFPUSHBUTTON,
-				300,     //button x pos
-				250,     //button y pos
+				(screenX - rect.right)/2,     //button x pos
+				(screenY - rect.bottom)/2,     //button y pos
 				200,     //button width
 				25,     // button height
 				hwnd,
@@ -143,10 +142,10 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
     case WM_GETMINMAXINFO:
             {
                 /* setting min/max window size */
-                ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 550;
-                ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 375;
-                ((MINMAXINFO*)lParam)->ptMaxTrackSize.x = 825;
-                ((MINMAXINFO*)lParam)->ptMaxTrackSize.y = 550;
+                ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+                ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 150;
+                //((MINMAXINFO*)lParam)->ptMaxTrackSize.x = 800;
+                //((MINMAXINFO*)lParam)->ptMaxTrackSize.y = 600;
             }
             break;
 
@@ -179,15 +178,20 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                         hwnd, 0,
                         0,
                         0,
-                        550, 375,
+                        200, 150,
                         SWP_NOMOVE | SWP_NOZORDER );
 
+                        MessageBox(NULL,
+						TEXT ("Do you like it?"),
+						"Mini",
+						MB_ICONQUESTION);
 
 
                 }
                 break;
             }
             break;
+
 
      case WM_PAINT:
             hdc = BeginPaint (hwnd, &ps) ;
@@ -217,6 +221,11 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
             EndPaint (hwnd, &ps) ;
             return 0 ;
 
+
+    case WM_VSCROLL:
+            // LOWORD(wParam) determines the desired scrolling action.
+//            CustomHandleVScroll(hwnd, LOWORD(wParam));
+            return 0;
 
     case WM_DESTROY:
             PostQuitMessage (0) ;
