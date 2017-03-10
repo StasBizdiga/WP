@@ -6,7 +6,7 @@ Personal information:
 
 - Student: Bizdiga Stanislav
 
-- Mail: azurium.official@gmail.com
+- Mail: stanislav.bizdiga@faf.utm.md
 
 ## Contained Laboratory Works
 
