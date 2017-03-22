@@ -129,7 +129,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 					SWP_NOZORDER|SWP_NOSIZE);
 
 
-				/* create centering button 3 */
+				/* create centering button */
                 centeringButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"CENTER",
@@ -148,7 +148,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				(WPARAM)hfDefault,
 				MAKELPARAM(FALSE,0));
 
-				/* create micro button 4 */
+				/* create micro button */
                 microButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"MICRO",
@@ -241,11 +241,10 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                         0,
                         200, 150,
                         SWP_NOMOVE | SWP_NOZORDER );
-
                         MessageBox(NULL,
 						TEXT ("Do you like it?"),
 						"Mini",
-						MB_ICONQUESTION);
+						MB_ICONQUESTION | MB_YESNO);
                         }
                         break;
 
