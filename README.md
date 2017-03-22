@@ -10,6 +10,6 @@ Personal information:
 
 ## Contained Laboratory Works
 
-_Red Pill_
-
 1. [Lab#1](https://github.com/StasBizdiga/WP/tree/master/Lab1)
+2. [Lab#2](https://github.com/StasBizdiga/WP/tree/master/Lab2)
+3. [Lab#3](https://github.com/StasBizdiga/WP/tree/master/Lab3)
