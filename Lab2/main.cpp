@@ -86,8 +86,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 	 int         screenX;                                                                                                                 //characters ave width of string
      int         screenY;
      static HWND microButton,centeringButton;
-     static HMENU hMenu;
-     POINT point;
+
 
      switch (message)
      {
@@ -310,8 +309,21 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
             break;
 
     case WM_VSCROLL:
-            // LOWORD(wParam) determines the desired scrolling action.
-            // CustomHandleVScroll(hwnd, LOWORD(wParam));
+            SetWindowPos(
+                        hwnd, 0,
+                        0,
+                        0,
+                        0, 0,
+                        SWP_NOZORDER|SWP_NOSIZE);
+            break;
+
+    case WM_HSCROLL:
+            SetWindowPos(
+                        hwnd, 0,
+                        0,
+                        0,
+                        300, 300,
+                        SWP_NOZORDER|SWP_NOMOVE);
             break;
 
     case WM_DESTROY:
