@@ -182,6 +182,37 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
             }
             break;
 
+    case WM_KEYDOWN:
+     if (GetKeyState(VK_SHIFT)<0)   //pressing shift returns negative value
+     {switch (wParam)
+     {
+          case VK_UP:
+               MessageBox(NULL,
+						TEXT ("Did you press UP?"),
+						"Question",
+						MB_ICONQUESTION);
+               break ;
+          case VK_DOWN:
+               MessageBox(NULL,
+						TEXT ("Did you press DOWN?"),
+						"Question",
+						MB_ICONQUESTION);
+               break ;
+          case VK_LEFT:
+               MessageBox(NULL,
+						TEXT ("Did you press LEFT?"),
+						"Question",
+						MB_ICONQUESTION);
+
+               break ;
+          case VK_RIGHT:
+               MessageBox(NULL,
+						TEXT ("Did you press RIGHT?"),
+						"Question",
+						MB_ICONQUESTION);
+               break ;
+    }}
+    break;
 
     case WM_COMMAND:
 			switch(LOWORD(wParam))
