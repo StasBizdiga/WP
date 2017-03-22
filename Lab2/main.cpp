@@ -1,19 +1,24 @@
-
-
 #include <windows.h>
 
 #define IDC_CENTER_BUTTON 101
 #define IDC_MICRO_BUTTON  102
 
+#define ID_FILE_EXIT 9001
+#define ID_HELP 9002
+#define ID_ABOUT 9003
+
+
 HWND hEdit,hMood;
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowsProcedure (HWND, UINT, WPARAM, LPARAM) ;
+
+     HINSTANCE hInst;
+     TCHAR szAppName[] = TEXT ("Lab-2") ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PSTR szCmdLine, int iCmdShow)
 {
 /*   Set the name for the application  */
-     static TCHAR szAppName[] = TEXT ("Lab-2") ;
 
      HWND         hwnd ;      /* Handle for window */
      MSG          message ;   /* Store messages here */
@@ -38,6 +43,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       szAppName, MB_ICONERROR) ;
           return 0 ;
      }
+
+     hInst = hInstance;
 
 /*   Once class is registered, create the window*/
      hwnd = CreateWindow (szAppName,             // window class name
@@ -78,14 +85,37 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
      HFONT       textFont,hFontOld;
 	 int         screenX;                                                                                                                 //characters ave width of string
      int         screenY;
-     HWND microButton,centeringButton;
-
+     static HWND microButton,centeringButton;
+     static HMENU hMenu;
+     POINT point;
 
      switch (message)
      {
 
      case WM_CREATE:
          {
+
+            /*Handling menu*/
+            HMENU hMenu, hSubMenu;
+
+            hMenu = CreateMenu();
+
+            hSubMenu = CreatePopupMenu();
+            AppendMenu(hSubMenu, MF_STRING, ID_FILE_EXIT, "E&xit");
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&File");
+
+            hSubMenu = CreatePopupMenu();
+            AppendMenu(hSubMenu, MF_STRING, IDC_CENTER_BUTTON, "&Center");
+            AppendMenu(hSubMenu, MF_STRING, IDC_MICRO_BUTTON, "&Micro");
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Functions");
+
+            hSubMenu = CreatePopupMenu();
+            AppendMenu(hSubMenu, MF_STRING, ID_ABOUT, "&About");
+            AppendMenu(hSubMenu, MF_STRING, ID_HELP, "&Help");
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Info");
+
+            SetMenu(hwnd, hMenu);
+
             /*Get height and width of screen*/
             screenX = GetSystemMetrics(SM_CXSCREEN);
             screenY = GetSystemMetrics(SM_CYSCREEN);
@@ -141,6 +171,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 		}
 		break;
 
+
     case WM_GETMINMAXINFO:
             {
                 /* setting min/max window size */
@@ -167,10 +198,8 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
                         (screenY/2 - rect.bottom/2),
                         0, 0,
                         SWP_NOZORDER|SWP_NOSIZE);
-
-
                         }
-                break;
+                        break;
 
 				case IDC_MICRO_BUTTON:
 				{
@@ -187,10 +216,32 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 						TEXT ("Do you like it?"),
 						"Mini",
 						MB_ICONQUESTION);
+                        }
+                        break;
 
+                case ID_ABOUT:
+                    {
+                        MessageBox(NULL,
+						TEXT ("About me or the program?"),
+						"Tell me",
+						MB_ICONQUESTION);
+                    }
+                        break;
 
-                }
-                break;
+                case ID_HELP:
+                    {
+                        MessageBox(NULL,
+						TEXT ("Help me please."),
+						"Help me",
+						MB_ICONWARNING);
+                    }
+                        break;
+                case ID_FILE_EXIT:
+                        DestroyWindow(hwnd);
+                        break;
+
+                default:
+                        return DefWindowProc(hwnd, message, wParam, lParam);
             }
             break;
 
