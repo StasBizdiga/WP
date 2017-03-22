@@ -1,5 +1,6 @@
-#include <windows.h>
 
+
+#include <windows.h>
 
 #define IDC_CENTER_BUTTON 101
 #define IDC_MICRO_BUTTON  102
@@ -77,6 +78,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
      HFONT       textFont,hFontOld;
 	 int         screenX;                                                                                                                 //characters ave width of string
      int         screenY;
+     HWND microButton,centeringButton;
 
 
      switch (message)
@@ -99,7 +101,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 
 
 				/* create centering button 3 */
-                HWND centeringButton = CreateWindowEx(NULL,
+                centeringButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"CENTER",
 				WS_TABSTOP|WS_VISIBLE|
@@ -118,7 +120,7 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
 				MAKELPARAM(FALSE,0));
 
 				/* create micro button 4 */
-                HWND microButton = CreateWindowEx(NULL,
+                microButton = CreateWindowEx(NULL,
 				"BUTTON",
 				"MICRO",
 				WS_TABSTOP|WS_VISIBLE|
@@ -221,11 +223,14 @@ LRESULT CALLBACK WindowsProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARA
             EndPaint (hwnd, &ps) ;
             return 0 ;
 
+    case WM_SIZE:
+
+            break;
 
     case WM_VSCROLL:
             // LOWORD(wParam) determines the desired scrolling action.
-//            CustomHandleVScroll(hwnd, LOWORD(wParam));
-            return 0;
+            // CustomHandleVScroll(hwnd, LOWORD(wParam));
+            break;
 
     case WM_DESTROY:
             PostQuitMessage (0) ;
