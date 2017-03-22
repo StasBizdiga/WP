@@ -68,15 +68,15 @@ It is undeniable though, that without googling I wouldn't have reached to the ac
   
 # Practical work procedure:
 
-##Create windows application
+## Create windows application
 
 Simple - go to file->new->project->win32gui 
 
-##Create text inputs/elements,buttons
+## Create text inputs/elements,buttons
 
 Fairly easy, in WM_CREATE you use CreateWindowsEx function with the EDIT or BUTTON parameter. You also need to make sure each message is defined, and then used in WM_COMMAND accordingly to access the case you require.
 
-##Create text in middle screen that due resizing remains there
+## Create text in middle screen that due resizing remains there
 
 Done, but due design features, it was moved to a right bottom align mode. The modern, copyright style/way.
 
