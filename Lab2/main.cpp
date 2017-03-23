@@ -8,7 +8,6 @@
 #define ID_ABOUT 9003
 
 
-HWND hEdit,hMood;
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowsProcedure (HWND, UINT, WPARAM, LPARAM) ;
 
