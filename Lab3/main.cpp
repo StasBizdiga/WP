@@ -4,9 +4,15 @@
 #define IDC_CIRC_BUTTON 103
 
 #define ID_FILE_EXIT 9001
-#define ID_TOOL_WEIGH 9002
-#define ID_TOOL_COLOR 9003
-#define ID_TOOL_FILL 9004
+#define ID_TOOL_WEIGHT_05 9002
+#define ID_TOOL_WEIGHT_10 9003
+#define ID_TOOL_WEIGHT_15 9004
+#define ID_TOOL_WEIGHT_20 9005
+#define ID_TOOL_COLOR_RED 9006
+#define ID_TOOL_COLOR_GRN 9007
+#define ID_TOOL_COLOR_BLU 9008
+#define ID_TOOL_COLOR_BLK 9009
+#define ID_TOOL_FILL 9010
 
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -74,6 +80,46 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
      switch (message)
      {
+
+
+     case WM_CREATE:
+         {
+
+            /*Handling menu*/
+            HMENU hMenu, hSubMenu, hSubSub;
+
+            hMenu = CreateMenu();
+
+            hSubMenu = CreatePopupMenu();
+            AppendMenu(hSubMenu, MF_STRING, ID_FILE_EXIT, "E&xit");
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&File");
+
+            hSubMenu = CreatePopupMenu();
+
+            hSubSub = CreatePopupMenu();
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_FILL, "&Fill");
+            AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Fill");
+
+            hSubSub = CreatePopupMenu();
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_COLOR_BLK, "&Black");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_COLOR_RED, "&Red");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_COLOR_GRN, "&Green");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_COLOR_BLU, "&Blue");
+            AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Color");
+
+            hSubSub = CreatePopupMenu();
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_WEIGHT_05, "0.5");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_WEIGHT_10, "1");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_WEIGHT_15, "1.5");
+            AppendMenu(hSubSub, MF_STRING, ID_TOOL_WEIGHT_20, "2");
+            AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Weight");
+
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Tool");
+
+
+            SetMenu(hwnd, hMenu);
+     } break;
+
      case WM_SIZE:
           cxClient = LOWORD (lParam) ;
           cyClient = HIWORD (lParam) ;
@@ -162,6 +208,37 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                }
           }
           return 0 ;
+
+     case WM_COMMAND:
+        switch(LOWORD(wParam))
+        {
+        case ID_TOOL_WEIGHT_05:
+            break;
+        case ID_TOOL_WEIGHT_10:
+            break;
+        case ID_TOOL_WEIGHT_15:
+            break;
+        case ID_TOOL_WEIGHT_20:
+            break;
+
+        case ID_TOOL_COLOR_BLK:
+            break;
+        case ID_TOOL_COLOR_RED:
+            break;
+        case ID_TOOL_COLOR_BLU:
+            break;
+        case ID_TOOL_COLOR_GRN:
+            break;
+
+        case ID_TOOL_FILL:
+            break;
+
+		case ID_FILE_EXIT:
+			PostQuitMessage(WM_QUIT);
+			break;
+
+        };
+        return 0;
 
      case WM_PAINT:
           InvalidateRect (hwnd, NULL, TRUE) ;
