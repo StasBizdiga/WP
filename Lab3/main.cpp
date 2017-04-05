@@ -10,6 +10,7 @@
 #define IDM_DRAW_FREE 105
 
 #define ID_FILE_EXIT 9001
+#define ID_TOOL_COLOR_WHT 9005
 #define ID_TOOL_COLOR_RED 9006
 #define ID_TOOL_COLOR_GRN 9007
 #define ID_TOOL_COLOR_BLU 9008
@@ -111,6 +112,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_RED, "&Red");
             AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_GRN, "&Green");
             AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_BLU, "&Blue");
+            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_WHT, "&White / Eraser");
             AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Color");
 
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Painting");
@@ -190,14 +192,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         if (wParam & MK_LBUTTON )
           {
- //         hdc = GetDC(hwnd);
 
                if (wParam & MK_LBUTTON)
                {
                     mousePOS[1].x = LOWORD (lParam) ;
                     mousePOS[1].y = HIWORD (lParam) ;
                }
- //         ReleaseDC(hwnd,hdc);
           }
 
 		if(GetKeyState(VK_SHIFT)<0)
@@ -301,7 +301,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case ID_TOOL_COLOR_BLK:
             crColor = RGB(0,0,0);
-
             break;
         case ID_TOOL_COLOR_RED:
             crColor = RGB(255,0,0);
@@ -311,6 +310,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case ID_TOOL_COLOR_GRN:
             crColor = RGB(0,255,0);
+            break;
+        case ID_TOOL_COLOR_WHT:
+            crColor = RGB(255,255,255);
             break;
 
 
