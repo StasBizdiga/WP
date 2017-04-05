@@ -77,7 +77,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
      static POINT pt1[4],pt2[4],mousePOS[2];
      HDC          hdc ;
-     int          cxClient, cyClient ;
+     static int          cxClient, cyClient ;
      static PAINTSTRUCT  ps ;
      static COLORREF     crColor;
      static HPEN hPen,hPenOld;
@@ -105,24 +105,24 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             hSubMenu = CreatePopupMenu();
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubMenu,  MF_STRING , ID_TOOL_FILL, "&Fill");
+            AppendMenu(hSubMenu, MFT_RADIOCHECK | MF_STRING , ID_TOOL_FILL, "&Fill");
 
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_BLK, "&Black");
-            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_RED, "&Red");
-            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_GRN, "&Green");
-            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_BLU, "&Blue");
-            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_WHT, "&White / Eraser");
+            AppendMenu(hSubSub,  MFT_RADIOCHECK | MF_STRING , ID_TOOL_COLOR_BLK, "&Black");
+            AppendMenu(hSubSub,  MFT_RADIOCHECK | MF_STRING , ID_TOOL_COLOR_RED, "&Red");
+            AppendMenu(hSubSub,  MFT_RADIOCHECK | MF_STRING , ID_TOOL_COLOR_GRN, "&Green");
+            AppendMenu(hSubSub,  MFT_RADIOCHECK | MF_STRING , ID_TOOL_COLOR_BLU, "&Blue");
+            AppendMenu(hSubSub,  MFT_RADIOCHECK | MF_STRING , ID_TOOL_COLOR_WHT, "&White / Eraser");
             AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Color");
 
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Painting");
 
             hSubMenu = CreatePopupMenu();
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_LINE, "&Line");
-            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_RECT, "&Rectangle");
-            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_CIRC, "&Ellipse");
-            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_FREE, "&Pencil");
+            AppendMenu(hSubMenu,  MFT_RADIOCHECK | MF_STRING , IDM_DRAW_LINE, "&Line");
+            AppendMenu(hSubMenu,  MFT_RADIOCHECK | MF_STRING , IDM_DRAW_RECT, "&Rectangle");
+            AppendMenu(hSubMenu,  MFT_RADIOCHECK | MF_STRING , IDM_DRAW_CIRC, "&Ellipse");
+            AppendMenu(hSubMenu,  MFT_RADIOCHECK | MF_STRING , IDM_DRAW_FREE, "&Pencil");
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu,"&Drawing Tools");
 
             SetMenu(hwnd, hMenu);
@@ -291,11 +291,25 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (width >= 1){width -= 1;}
             break;
         case VK_DELETE:
+            hdc = GetDC(hwnd);
+            SelectObject (hdc, GetStockObject (WHITE_PEN));
+            SelectObject(hdc, GetStockObject(WHITE_BRUSH));
+            Rectangle (hdc,     0,     0 ,
+            cxClient, cyClient) ;
+            ReleaseDC(hwnd,hdc);
             break;
-        case VK_SPACE:
+        case VK_SPACE: //setting fill by space hot key
+            if(toFill){ CheckMenuItem(hMenu, ID_TOOL_FILL, MFS_UNCHECKED);
+            toFill = FALSE;}
+            else { CheckMenuItem(hMenu, ID_TOOL_FILL, MFS_CHECKED);
+            toFill = TRUE;}
             break;
 		case VK_ESCAPE:
 		    drawTool=0;
+		    CheckMenuItem(hMenu, IDM_DRAW_CIRC, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_RECT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_LINE, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_FREE, MFS_UNCHECKED);
 			break;
 
 		default:
@@ -309,38 +323,79 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case IDM_DRAW_LINE:
             drawTool = 1;
+            CheckMenuItem(hMenu, IDM_DRAW_LINE, MFS_CHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_RECT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_CIRC, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_FREE, MFS_UNCHECKED);
             break;
         case IDM_DRAW_RECT:
             drawTool = 2;
+            CheckMenuItem(hMenu, IDM_DRAW_RECT, MFS_CHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_LINE, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_CIRC, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_FREE, MFS_UNCHECKED);
             break;
         case IDM_DRAW_CIRC:
             drawTool = 3;
+            CheckMenuItem(hMenu, IDM_DRAW_CIRC, MFS_CHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_RECT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_LINE, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_FREE, MFS_UNCHECKED);
             break;
         case IDM_DRAW_FREE:
             drawTool = 5;
+            CheckMenuItem(hMenu, IDM_DRAW_FREE, MFS_CHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_RECT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_CIRC, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, IDM_DRAW_LINE, MFS_UNCHECKED);
             break;
 
         case ID_TOOL_COLOR_BLK:
             crColor = RGB(0,0,0);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLK, MFS_CHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLU, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_WHT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_GRN, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_RED, MFS_UNCHECKED);
             break;
         case ID_TOOL_COLOR_RED:
             crColor = RGB(255,0,0);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_RED, MFS_CHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLU, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLK, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_GRN, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_WHT, MFS_UNCHECKED);
             break;
         case ID_TOOL_COLOR_BLU:
             crColor = RGB(0,0,255);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLU, MFS_CHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_WHT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLK, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_GRN, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_RED, MFS_UNCHECKED);
             break;
         case ID_TOOL_COLOR_GRN:
             crColor = RGB(0,255,0);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_GRN, MFS_CHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLU, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLK, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_WHT, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_RED, MFS_UNCHECKED);
             break;
         case ID_TOOL_COLOR_WHT:
             crColor = RGB(255,255,255);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_WHT, MFS_CHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLU, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_BLK, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_GRN, MFS_UNCHECKED);
+            CheckMenuItem(hMenu, ID_TOOL_COLOR_RED, MFS_UNCHECKED);
             break;
 
 
         case ID_TOOL_FILL:
-            if(toFill){
+            if(toFill){ CheckMenuItem(hMenu, ID_TOOL_FILL, MFS_UNCHECKED);
             toFill = FALSE;}
-            else {
+            else { CheckMenuItem(hMenu, ID_TOOL_FILL, MFS_CHECKED);
             toFill = TRUE;}
             break;
 
