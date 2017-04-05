@@ -6,7 +6,6 @@
 #define IDM_DRAW_LINE 101
 #define IDM_DRAW_RECT 102
 #define IDM_DRAW_CIRC 103
-#define IDM_DRAW_POLYLINE 104
 #define IDM_DRAW_FREE 105
 
 #define ID_FILE_EXIT 9001
@@ -82,6 +81,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
      static PAINTSTRUCT  ps ;
      static COLORREF     crColor;
      static HPEN hPen,hPenOld;
+     static HBRUSH hBrush;
 
      static bool toFill = FALSE;
      static int drawTool = 0;
@@ -122,7 +122,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_LINE, "&Line");
             AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_RECT, "&Rectangle");
             AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_CIRC, "&Ellipse");
-            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_POLYLINE, "P&oly Line");
             AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_FREE, "&Pencil");
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu,"&Drawing Tools");
 
@@ -169,23 +168,37 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         mousePOS[0].x = LOWORD (lParam) ;
         mousePOS[0].y = HIWORD (lParam) ;
-        }break;
+        }
+        break;
 
 	case WM_LBUTTONUP:
-        if (drawTool==1)
-        {
-        hdc = GetDC(hwnd);
-        hPen = CreatePen(PS_SOLID, width, crColor);
-        SelectObject(hdc, hPen);
 
-        MoveToEx(hdc, mousePOS[0].x, mousePOS[0].y, NULL);
-        LineTo(hdc, mousePOS[1].x, mousePOS[1].y);
+        if (drawTool!=0)
+                {
+                hdc = GetDC(hwnd);
+                hPen = CreatePen(PS_SOLID, width, crColor);
+                hBrush = CreateSolidBrush(crColor);
+                SelectObject(hdc, hPen);
+                if(!toFill){SelectObject(hdc, GetStockObject(NULL_BRUSH));}
+                else if (toFill){SelectObject(hdc, hBrush);}
+                if (drawTool==1){
+                MoveToEx(hdc, mousePOS[0].x, mousePOS[0].y, NULL);
+                LineTo(hdc, mousePOS[1].x, mousePOS[1].y);
+                }
+                else if (drawTool==2){
+                Rectangle (hdc,     mousePOS[0].x, mousePOS[0].y,
+                mousePOS[1].x, mousePOS[1].y) ;}
+                else if (drawTool==3){
+                Ellipse (hdc,     mousePOS[0].x, mousePOS[0].y,
+                mousePOS[1].x, mousePOS[1].y) ;}
+                DeleteObject(hPen);
+                DeleteObject(hBrush);
+                ReleaseDC(hwnd, hdc);
+                }
 
-        DeleteObject(hPen);
 
-        ReleaseDC(hwnd, hdc);
 
-        }break;
+        break;
 
 
 	case WM_MOUSEMOVE:
@@ -197,6 +210,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                {
                     mousePOS[1].x = LOWORD (lParam) ;
                     mousePOS[1].y = HIWORD (lParam) ;
+
+                    if (drawTool==5)
+                        {
+                        hdc = GetDC(hwnd);
+                        hPen = CreatePen(PS_SOLID, width+1, crColor);
+                        SelectObject(hdc, hPen);
+                        MoveToEx(hdc, mousePOS[1].x, mousePOS[1].y, NULL);
+                        LineTo(hdc, mousePOS[1].x, mousePOS[1].y);
+                        DeleteObject(hPen);
+                        ReleaseDC(hwnd, hdc);
+                        }
                }
           }
 
@@ -264,7 +288,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (width < 10){width += 1;}
             break;
         case VK_SUBTRACT:
-            if (width >= 1) {width -= 1;}
+            if (width >= 1){width -= 1;}
             break;
         case VK_DELETE:
             break;
@@ -292,9 +316,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_DRAW_CIRC:
             drawTool = 3;
             break;
-        case IDM_DRAW_POLYLINE:
-            drawTool = 4;
-            break;
         case IDM_DRAW_FREE:
             drawTool = 5;
             break;
@@ -317,9 +338,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
         case ID_TOOL_FILL:
-            if(toFill){SelectObject(hdc, GetStockObject(GRAY_BRUSH));
+            if(toFill){
             toFill = FALSE;}
-            else {SelectObject(hdc, GetStockObject(NULL_BRUSH));
+            else {
             toFill = TRUE;}
             break;
 
@@ -338,16 +359,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
           DrawBezier (hdc, pt1) ;
           DrawBezier (hdc, pt2) ;
 
-        /*
-          Rectangle (hdc,     200 / 8,     400 / 8,
-                     7 * 200 / 8, 7 * 400 / 8) ;
-
-          Ellipse   (hdc,     1500 / 8,     800 / 8,
-                     7 * 1500 / 8, 7 * 800 / 8) ;
-          RoundRect (hdc,     100,     20 ,
-                     400, 400 ,
+          SelectObject(hdc, GetStockObject(NULL_BRUSH));
+          RoundRect (hdc,     600,     20 ,
+                     800, 400 ,
                          200,     20) ;
-*/
+
 
             SelectObject(hdc, hPenOld);
             DeleteObject(hPen);
