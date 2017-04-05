@@ -1,3 +1,4 @@
+#define _WIN32_WINNT 0x0500
 #include <windows.h>
 #include <commctrl.h>
 
@@ -74,14 +75,17 @@ void DrawBezier (HDC hdc, POINT pt1[])
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-     static POINT pt1[4],pt2[4] ;
+     static POINT pt1[4],pt2[4],mousePOS[2];
      HDC          hdc ;
      int          cxClient, cyClient ;
-     PAINTSTRUCT  ps ;
-	 HPEN		  hPen;
-     LOGPEN       LogPen;
+     static PAINTSTRUCT  ps ;
+     static COLORREF     crColor;
+     static HPEN hPen,hPenOld;
 
-     HMENU hMenu, hSubMenu, hSubSub;
+     static bool toFill = FALSE;
+     static int drawTool = 0;
+     static float width = 1;
+     static HMENU hMenu, hSubMenu, hSubSub;
 
      switch (message)
      {
@@ -100,35 +104,35 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             hSubMenu = CreatePopupMenu();
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , ID_TOOL_FILL, "&Fill");
+            AppendMenu(hSubMenu,  MF_STRING , ID_TOOL_FILL, "&Fill");
 
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubSub, BS_CHECKBOX | MF_STRING , ID_TOOL_COLOR_BLK, "&Black");
-            AppendMenu(hSubSub, BS_CHECKBOX | MF_STRING , ID_TOOL_COLOR_RED, "&Red");
-            AppendMenu(hSubSub, BS_CHECKBOX | MF_STRING , ID_TOOL_COLOR_GRN, "&Green");
-            AppendMenu(hSubSub, BS_CHECKBOX | MF_STRING , ID_TOOL_COLOR_BLU, "&Blue");
+            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_BLK, "&Black");
+            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_RED, "&Red");
+            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_GRN, "&Green");
+            AppendMenu(hSubSub,  MF_STRING , ID_TOOL_COLOR_BLU, "&Blue");
             AppendMenu(hSubMenu, MF_STRING | MF_POPUP, (UINT)hSubSub,"&Color");
 
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Painting");
 
             hSubMenu = CreatePopupMenu();
             hSubSub = CreatePopupMenu();
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , IDM_DRAW_LINE, "&Line");
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , IDM_DRAW_RECT, "&Rectangle");
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , IDM_DRAW_CIRC, "&Ellipse");
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , IDM_DRAW_POLYLINE, "P&oly Line");
-            AppendMenu(hSubMenu, BS_CHECKBOX | MF_STRING , IDM_DRAW_FREE, "&Pencil");
+            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_LINE, "&Line");
+            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_RECT, "&Rectangle");
+            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_CIRC, "&Ellipse");
+            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_POLYLINE, "P&oly Line");
+            AppendMenu(hSubMenu,  MF_STRING , IDM_DRAW_FREE, "&Pencil");
             AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu,"&Drawing Tools");
 
             SetMenu(hwnd, hMenu);
      } break;
 
      case WM_SIZE:
-          cxClient = LOWORD (lParam) ;
-          cyClient = HIWORD (lParam) ;
 
           // BEZIER LINE 1
           //////////////////////////////
+          cxClient = LOWORD (lParam) ;
+          cyClient = HIWORD (lParam) ;
           pt1[0].x = cxClient / 8 ;
           pt1[0].y = cyClient / 8 ;
 
@@ -159,8 +163,42 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 
+    case WM_LBUTTONDOWN:
+        {
+        mousePOS[0].x = LOWORD (lParam) ;
+        mousePOS[0].y = HIWORD (lParam) ;
+        }break;
+
+	case WM_LBUTTONUP:
+        if (drawTool==1)
+        {
+        hdc = GetDC(hwnd);
+        hPen = CreatePen(PS_SOLID, width, crColor);
+        SelectObject(hdc, hPen);
+
+        MoveToEx(hdc, mousePOS[0].x, mousePOS[0].y, NULL);
+        LineTo(hdc, mousePOS[1].x, mousePOS[1].y);
+
+        DeleteObject(hPen);
+
+        ReleaseDC(hwnd, hdc);
+
+        }break;
+
 
 	case WM_MOUSEMOVE:
+
+        if (wParam & MK_LBUTTON )
+          {
+ //         hdc = GetDC(hwnd);
+
+               if (wParam & MK_LBUTTON)
+               {
+                    mousePOS[1].x = LOWORD (lParam) ;
+                    mousePOS[1].y = HIWORD (lParam) ;
+               }
+ //         ReleaseDC(hwnd,hdc);
+          }
 
 		if(GetKeyState(VK_SHIFT)<0)
           {
@@ -184,6 +222,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                SelectObject (hdc, GetStockObject (BLACK_PEN)) ;
                DrawBezier (hdc, pt1) ;
+
                ReleaseDC(hwnd, hdc);
                }
           }
@@ -222,14 +261,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(wParam)
 		{
         case VK_ADD:
+            if (width < 10){width += 1;}
             break;
         case VK_SUBTRACT:
+            if (width >= 1) {width -= 1;}
             break;
         case VK_DELETE:
             break;
         case VK_SPACE:
             break;
 		case VK_ESCAPE:
+		    drawTool=0;
 			break;
 
 		default:
@@ -242,34 +284,41 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch(LOWORD(wParam))
         {
         case IDM_DRAW_LINE:
+            drawTool = 1;
+            break;
+        case IDM_DRAW_RECT:
+            drawTool = 2;
+            break;
+        case IDM_DRAW_CIRC:
+            drawTool = 3;
+            break;
+        case IDM_DRAW_POLYLINE:
+            drawTool = 4;
+            break;
+        case IDM_DRAW_FREE:
+            drawTool = 5;
             break;
 
         case ID_TOOL_COLOR_BLK:
-            LogPen.lopnStyle = PS_SOLID;
-            LogPen.lopnColor = RGB(0, 0, 0);
-            hPen = CreatePenIndirect(&LogPen);
-            SelectObject(hdc, hPen);
+            crColor = RGB(0,0,0);
+
             break;
         case ID_TOOL_COLOR_RED:
-            LogPen.lopnStyle = PS_SOLID;
-            LogPen.lopnColor = RGB(255, 0, 0);
-            hPen = CreatePenIndirect(&LogPen);
-            SelectObject(hdc, hPen);
+            crColor = RGB(255,0,0);
             break;
         case ID_TOOL_COLOR_BLU:
-            LogPen.lopnStyle = PS_SOLID;
-            LogPen.lopnColor = RGB(0, 0, 255);
-            hPen = CreatePenIndirect(&LogPen);
-            SelectObject(hdc, hPen);
+            crColor = RGB(0,0,255);
             break;
         case ID_TOOL_COLOR_GRN:
-            LogPen.lopnStyle = PS_SOLID;
-            LogPen.lopnColor = RGB(0, 255, 0);
-            hPen = CreatePenIndirect(&LogPen);
-            SelectObject(hdc, hPen);
+            crColor = RGB(0,255,0);
             break;
 
+
         case ID_TOOL_FILL:
+            if(toFill){SelectObject(hdc, GetStockObject(GRAY_BRUSH));
+            toFill = FALSE;}
+            else {SelectObject(hdc, GetStockObject(NULL_BRUSH));
+            toFill = TRUE;}
             break;
 
 		case ID_FILE_EXIT:
@@ -287,12 +336,23 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
           DrawBezier (hdc, pt1) ;
           DrawBezier (hdc, pt2) ;
 
+        /*
+          Rectangle (hdc,     200 / 8,     400 / 8,
+                     7 * 200 / 8, 7 * 400 / 8) ;
 
+          Ellipse   (hdc,     1500 / 8,     800 / 8,
+                     7 * 1500 / 8, 7 * 800 / 8) ;
+          RoundRect (hdc,     100,     20 ,
+                     400, 400 ,
+                         200,     20) ;
+*/
+
+            SelectObject(hdc, hPenOld);
+            DeleteObject(hPen);
           EndPaint (hwnd, &ps) ;
           return 0 ;
 
      case WM_DESTROY:
-          DeleteObject(hPen);
           PostQuitMessage (0) ;
           return 0 ;
      }
