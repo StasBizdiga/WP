@@ -70,10 +70,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
      case WM_MOUSEWHEEL:
         { if(GET_WHEEL_DELTA_WPARAM(wParam)>0 && animSpeed < 500) {animSpeed += 1; }
-          if(GET_WHEEL_DELTA_WPARAM(wParam)<0 && animSpeed > 1 ) {animSpeed -= 1; }
+          if(GET_WHEEL_DELTA_WPARAM(wParam)<0 && animSpeed > 20 ) {animSpeed -= 1; }
           SetTimer (hwnd, ID_TIMER, animSpeed, TimerProc) ;
           return 0;
         }
+
+     case WM_ERASEBKGND:
+     return 1;
 
      case WM_DESTROY:
           KillTimer (hwnd, ID_TIMER) ;
@@ -88,31 +91,48 @@ VOID CALLBACK TimerProc (HWND hwnd, UINT message, UINT iTimerID, DWORD dwTime)
      HDC         hdc ;
      static POINT pt[2];
      static int animState = 0;
-     static int animSlidesNum = 30;
+     static int animSlidesNum = 20;
+     static int step = 5;
 
 
      hdc = GetDC (hwnd) ;
 
-               SelectObject (hdc, GetStockObject (WHITE_PEN)) ;
-               Rectangle(hdc, pt[0].x,pt[0].y,pt[1].x,pt[1].y) ;
-
-               animState += 1;
-                    pt[0].x += 5;
-                    pt[0].y += 5;
-                    pt[1].x -= 5;
-                    pt[1].y -= 5;
-
-               SelectObject (hdc, GetStockObject (BLACK_PEN)) ;
-               Rectangle(hdc, pt[0].x,pt[0].y,pt[1].x,pt[1].y) ;
-
-               if (animState>=animSlidesNum || pt[1].x <= pt[0].x || pt[1].y <= pt[0].y ) //looping animation
-               {
+                if (animState>=animSlidesNum){animState=0;
+                    step = -step;}
+                else if (animState==animSlidesNum/2){step = -step;}
+                if (animState==0) //looping animation
+                {
                    animState=0;
                     pt[0].x = 100;
                     pt[0].y = 100;
-                    pt[1].x = 200;
-                    pt[1].y = 200;
-               }
+                    pt[1].x = 125;
+                    pt[1].y = 125;
+                }
+/*
+               SelectObject (hdc, GetStockObject (WHITE_PEN)) ;
+               Rectangle(hdc, pt[0].x+600,pt[0].y,pt[1].x+600,pt[1].y) ;
+               RoundRect(hdc, pt[0].x+200,pt[0].y,pt[1].x+200,pt[1].y+150,100,100) ;
+               Ellipse(hdc, pt[0].x+400,pt[0].y,pt[1].x+400,pt[1].y) ;
+               Pie(hdc, pt[0].x+400,pt[0].y+200,pt[1].x+400,pt[1].y+200, 0,pt[0].y*100,pt[1].x*100,pt[1].y*100) ;
+               Polygon(hdc,pt,5);
+*/
+            //SelectObject (hdc, GetStockObject (WHITE_PEN));
+            SelectObject(hdc, GetStockObject(WHITE_BRUSH));
+            Rectangle (hdc,     0,     0 ,
+            2000, 1000) ;
+
+               animState += 1;
+                    pt[0].x -= step;
+                    pt[0].y -= step;
+                    pt[1].x += step;
+                    pt[1].y += step;
+
+               SelectObject (hdc, GetStockObject (BLACK_PEN)) ;
+               Rectangle(hdc, pt[0].x+600,pt[0].y,pt[1].x+600,pt[1].y) ;
+               RoundRect(hdc, pt[0].x+200,pt[0].y,pt[1].x+200,pt[1].y+150,100,100) ;
+               Ellipse(hdc, pt[0].x+400,pt[0].y,pt[1].x+400,pt[1].y) ;
+               Pie(hdc, pt[0].x+400,pt[0].y+200,pt[1].x+400,pt[1].y+200, 0,pt[0].y*100,pt[1].x*100,pt[1].y*100) ;
+               Polygon(hdc,pt,5);
 
      ReleaseDC (hwnd, hdc) ;
 }
