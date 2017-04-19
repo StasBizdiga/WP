@@ -108,25 +108,21 @@ VOID CALLBACK TimerProc (HWND hwnd, UINT message, UINT iTimerID, DWORD dwTime)
                     pt[1].x = 125;
                     pt[1].y = 125;
                 }
-/*
+// clear
                SelectObject (hdc, GetStockObject (WHITE_PEN)) ;
                Rectangle(hdc, pt[0].x+600,pt[0].y,pt[1].x+600,pt[1].y) ;
                RoundRect(hdc, pt[0].x+200,pt[0].y,pt[1].x+200,pt[1].y+150,100,100) ;
                Ellipse(hdc, pt[0].x+400,pt[0].y,pt[1].x+400,pt[1].y) ;
                Pie(hdc, pt[0].x+400,pt[0].y+200,pt[1].x+400,pt[1].y+200, 0,pt[0].y*100,pt[1].x*100,pt[1].y*100) ;
                Polygon(hdc,pt,5);
-*/
-            //SelectObject (hdc, GetStockObject (WHITE_PEN));
-            SelectObject(hdc, GetStockObject(WHITE_BRUSH));
-            Rectangle (hdc,     0,     0 ,
-            2000, 1000) ;
+
 
                animState += 1;
                     pt[0].x -= step;
                     pt[0].y -= step;
                     pt[1].x += step;
                     pt[1].y += step;
-
+// draw
                SelectObject (hdc, GetStockObject (BLACK_PEN)) ;
                Rectangle(hdc, pt[0].x+600,pt[0].y,pt[1].x+600,pt[1].y) ;
                RoundRect(hdc, pt[0].x+200,pt[0].y,pt[1].x+200,pt[1].y+150,100,100) ;
