@@ -1,6 +1,6 @@
 # Laboratory works repository
 
-Personal information:
+### Personal information:
 
 - Group: FAF-151
 
@@ -14,3 +14,4 @@ Personal information:
 2. [Lab#2](https://github.com/StasBizdiga/WP/tree/master/Lab2)
 3. [Lab#3](https://github.com/StasBizdiga/WP/tree/master/Lab3)
 4. [Lab#4](https://github.com/StasBizdiga/WP/tree/master/Lab4)
+4. [Lab#5](https://github.com/StasBizdiga/WP/tree/master/Lab5)
