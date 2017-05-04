@@ -1,10 +1,10 @@
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0500 // this helps with some weird ref bugs
 #include <windows.h>
 #include <commctrl.h>
 #include <cmath>
 #include "visual.h"
 #include "object.h"
-#define ID_TIMER    1
+#define ID_TIMER  1
 
 LRESULT CALLBACK WndProc   (HWND, UINT, WPARAM, LPARAM) ;
 VOID    CALLBACK TimerProc (HWND, UINT, UINT,   DWORD ) ;
@@ -53,37 +53,69 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
      return msg.wParam ;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// global vars
+///////////////////////////////////////////////////////////////////////////////
+
+static int semaphorePeriod = 100; // period of time for a semaphore to stay green or red [this period is adjustable]
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc = GetDC(hwnd);
+    static int simulationSpeed ;
+    int init = 1;
 
     switch (message)
-     {
+    {
 
-     case WM_CREATE:
-          return 0 ;
+    case WM_CREATE:
+        if (init){
+            simulationSpeed = 20;
+            SetTimer (hwnd, ID_TIMER, simulationSpeed, TimerProc) ;
+            init = 0;
+        }
+        break;
 
+    case WM_MOUSEWHEEL: // mouse handler for semaphore light switching speed
+
+        if(GET_WHEEL_DELTA_WPARAM(wParam)>0 && semaphorePeriod < 200) {semaphorePeriod += 1; }
+        if(GET_WHEEL_DELTA_WPARAM(wParam)<0 && semaphorePeriod > 10 ) {semaphorePeriod -= 1; }
+
+        break;
 
     case WM_PAINT:
         hdc = GetDC (hwnd) ;
 
-        DrawIntersection(hdc);
+        DrawIntersection(hdc); // draws the streets and the city
 
         ReleaseDC (hwnd, hdc) ;
-        return 0;
+        break;
 
 
-     case WM_DESTROY:
-          KillTimer (hwnd, ID_TIMER) ;
-          PostQuitMessage (0) ;
-          return 0 ;
-     }
-     return DefWindowProc (hwnd, message, wParam, lParam) ;
+    case WM_DESTROY:
+        KillTimer (hwnd, ID_TIMER) ;
+        PostQuitMessage (0) ;
+        break;
+    }
+    return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
 VOID CALLBACK TimerProc (HWND hwnd, UINT message, UINT iTimerID, DWORD dwTime)
 {
+    static bool is_vertical_flow_allowed = true;
+    static int time = 0;
+    HDC hdc = GetDC(hwnd);
 
+    if (time >= semaphorePeriod) // flipping semaphore red/green when its period ends [this period is adjustable]
+    {
+        time=0;
+        is_vertical_flow_allowed = !is_vertical_flow_allowed;
+    }
+
+    DrawTrafficLights(hdc,is_vertical_flow_allowed); // draws traffic interchangeable lights, for vertical/horizontal flow
+
+
+    time += 1;
+    ReleaseDC (hwnd, hdc);
 }
 

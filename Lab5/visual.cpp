@@ -20,3 +20,29 @@ void DrawIntersection(HDC hdc)
         LineTo(hdc,400,250);              // right horizontal line
     return;
 }
+
+void DrawTrafficLights(HDC hdc, bool is_vertical_flow_allowed)
+{
+    SelectObject (hdc, GetStockObject (BLACK_PEN)) ;
+
+    if (is_vertical_flow_allowed)
+    {
+        SelectObject (hdc, GetStockObject (WHITE_BRUSH)); // !feature! NEED GREEN BRUSH
+        Rectangle(hdc, 290,310,300,320) ;  //SE (v>)
+        Rectangle(hdc, 200,180,210,190) ;  //NW (^<)
+        SelectObject (hdc, GetStockObject (BLACK_BRUSH)); // !feature! NEED RED BRUSH
+        Rectangle(hdc, 310,200,320,210) ;  //NE (^>)
+        Rectangle(hdc, 180,290,190,300) ;  //SW (v<)
+    }
+    else //then horizontal flow is allowed
+    {
+        SelectObject (hdc, GetStockObject (BLACK_BRUSH)); // !feature! NEED GREEN BRUSH
+        Rectangle(hdc, 290,310,300,320) ;  //SE (v>)
+        Rectangle(hdc, 200,180,210,190) ;  //NW (^<)
+        SelectObject (hdc, GetStockObject (WHITE_BRUSH)); // !feature! NEED RED BRUSH
+        Rectangle(hdc, 310,200,320,210) ;  //NE (^>)
+        Rectangle(hdc, 180,290,190,300) ;  //SW (v<)
+    }
+    SelectObject (hdc, GetStockObject (NULL_BRUSH));
+    return;
+}
