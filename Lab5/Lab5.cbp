@@ -33,6 +33,10 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
+		<Unit filename="object.cpp" />
+		<Unit filename="object.h" />
+		<Unit filename="visual.cpp" />
+		<Unit filename="visual.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
