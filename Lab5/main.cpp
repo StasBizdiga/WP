@@ -2,6 +2,8 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <cmath>
+#include "visual.h"
+#include "object.h"
 #define ID_TIMER    1
 
 LRESULT CALLBACK WndProc   (HWND, UINT, WPARAM, LPARAM) ;
@@ -54,6 +56,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HDC hdc = GetDC(hwnd);
+
     switch (message)
      {
 
@@ -61,8 +65,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
           return 0 ;
 
 
-     case WM_PAINT:
-          return 0;
+    case WM_PAINT:
+        hdc = GetDC (hwnd) ;
+
+        DrawIntersection(hdc);
+
+        ReleaseDC (hwnd, hdc) ;
+        return 0;
 
 
      case WM_DESTROY:
